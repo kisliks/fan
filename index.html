@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>allah — Вентиляторы</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #0b0f19; 
+            color: #f8fafc; 
+        }
+
+        .cup-item {
+            will-change: transform, opacity;
+            backface-visibility: hidden;
+            transform-origin: bottom center;
+        }
+
+        /* Red Solo Cup Design */
+        .red-cup {
+            width: 16px;
+            height: 22px;
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            border-top: 2px solid #ffffff;
+            border-radius: 2px 2px 3px 3px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), inset 0 2px 3px rgba(255, 255, 255, 0.25);
+            position: relative;
+        }
+        .red-cup::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 2px;
+            right: 2px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.35);
+            border-radius: 1px;
+        }
+
+        /* GPU-Accelerated Fan Blade Rotation */
+        @keyframes spin-fan {
+            from { transform: translate3d(0,0,0) rotate(0deg); }
+            to { transform: translate3d(0,0,0) rotate(360deg); }
+        }
+
+        .fan-blade-spin {
+            transform-origin: center;
+            will-change: transform;
+            animation: spin-fan var(--spin-dur, 0s) linear infinite;
+        }
+
+        /* Ultra-smooth 60 FPS GPU-accelerated flight trajectories from left to right */
+        @keyframes blow-flight-desktop {
+            0% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 1; }
+            20% { transform: translate3d(70px, -25px, 0) rotate(120deg); }
+            50% { transform: translate3d(190px, -12px, 0) rotate(280deg); }
+            80% { transform: translate3d(320px, -20px, 0) rotate(480deg); opacity: 0.9; }
+            100% { transform: translate3d(430px, -5px, 0) rotate(640deg); opacity: 0; }
+        }
+
+        @keyframes blow-flight-tower {
+            0% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 1; }
+            25% { transform: translate3d(90px, -35px, 0) rotate(140deg); }
+            55% { transform: translate3d(220px, -8px, 0) rotate(310deg); }
+            85% { transform: translate3d(350px, -22px, 0) rotate(500deg); opacity: 0.8; }
+            100% { transform: translate3d(460px, -5px, 0) rotate(680deg); opacity: 0; }
+        }
+
+        @keyframes blow-flight-industrial {
+            0% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 1; }
+            20% { transform: translate3d(100px, -18px, 0) rotate(180deg); }
+            60% { transform: translate3d(280px, -4px, 0) rotate(420deg); opacity: 0.85; }
+            100% { transform: translate3d(480px, -10px, 0) rotate(720deg); opacity: 0; }
+        }
+
+        @keyframes wind-stream-flow {
+            0% { transform: translate3d(-20%, 0, 0); opacity: 0; }
+            40% { opacity: 0.9; }
+            100% { transform: translate3d(300%, 0, 0); opacity: 0; }
+        }
+
+        /* Cyan Wind Streamlines */
+        .wind-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.95), transparent);
+            border-radius: 9999px;
+            will-change: transform, opacity;
+        }
+
+        .animate-desk { animation: blow-flight-desktop var(--anim-dur) linear infinite; }
+        .animate-tower { animation: blow-flight-tower var(--anim-dur) ease-in-out infinite; }
+        .animate-industrial { animation: blow-flight-industrial var(--anim-dur) linear infinite; }
+        .animate-wind { animation: wind-stream-flow var(--wind-dur) linear infinite; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between bg-slate-950 text-slate-100">
+
+    <header class="border-b border-slate-800/80 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span class="text-4xl font-black tracking-tight text-cyan-400 drop-shadow-[0_0_20px_rgba(6,182,212,0.7)]">allah</span>
+            </div>
+            
+            <button onclick="toggleCart()" class="relative bg-slate-800/80 hover:bg-slate-700 text-slate-200 px-5 py-2.5 rounded-xl border border-cyan-500/30 font-semibold transition flex items-center gap-2.5 shadow-lg shadow-cyan-950/30">
+                <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                <span>Корзина</span>
+                <span id="cart-badge" class="bg-cyan-400 text-slate-950 text-xs font-black px-2 py-0.5 rounded-full hidden">0</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-10 flex-1 w-full">
+        <div class="text-center max-w-3xl mx-auto mb-12">
+            <h1 class="text-4xl md:text-5xl font-black tracking-tight text-white mb-3">
+                Мощность потока <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-sky-300">allah</span>
+            </h1>
+            <p class="text-slate-400 text-base">
+                Выберите режим работы вентилятора и оцените аэродинамический удар на стаканчиках.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- Product 1: AeroBreeze -->
+            <div class="bg-slate-900/90 rounded-2xl border border-slate-800 p-6 flex flex-col justify-between shadow-xl">
+                <div>
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Настольный</span>
+                            <h3 class="text-2xl font-bold text-white mt-1">AeroBreeze</h3>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-black text-white">149 <span class="text-sm text-cyan-400">BYN</span></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950 rounded-xl p-4 border border-slate-800/80 mb-6 relative overflow-hidden">
+                        <div class="flex justify-between items-center mb-3 text-xs">
+                            <span class="text-slate-400 font-medium">Тестовый стенд</span>
+                            <span id="speed-text-1" class="font-bold text-cyan-400 bg-cyan-950/60 px-2.5 py-1 rounded-md border border-cyan-800/40">0.0 м/с (0.0 км/ч)</span>
+                        </div>
+
+                        <div class="h-48 relative flex items-end justify-start px-2 overflow-hidden bg-gradient-to-b from-slate-950 to-slate-900/50 rounded-lg border border-slate-900">
+                            <!-- Fan Left -->
+                            <div class="z-20 relative flex flex-col items-center mb-2 shrink-0">
+                                <svg class="w-16 h-20 text-slate-300" viewBox="0 0 100 120" fill="none" stroke="currentColor">
+                                    <path d="M30 110 L70 110 L60 90 L40 90 Z" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+                                    <rect x="46" y="55" width="8" height="38" fill="#334155"/>
+                                    <circle cx="50" cy="45" r="35" stroke="#06b6d4" stroke-width="3" fill="#0f172a"/>
+                                    <g id="blades-1" class="fan-blade-spin" style="transform-origin: 50px 45px;">
+                                        <circle cx="50" cy="45" r="6" fill="#06b6d4"/>
+                                        <path d="M50 45 Q35 25 50 15 Q65 25 50 45 Z" fill="#06b6d4" opacity="0.9"/>
+                                        <path d="M50 45 Q70 35 80 50 Q70 65 50 45 Z" fill="#06b6d4" opacity="0.9"/>
+                                        <path d="M50 45 Q65 65 50 75 Q35 65 50 45 Z" fill="#06b6d4" opacity="0.9"/>
+                                        <path d="M50 45 Q30 55 20 40 Q30 25 50 45 Z" fill="#06b6d4" opacity="0.9"/>
+                                    </g>
+                                </svg>
+                            </div>
+
+                            <!-- 2 Red Cup Towers directly next to fan -->
+                            <div class="flex gap-1.5 items-end z-10 mb-1 ml-1 shrink-0">
+                                <div class="flex flex-col items-center">
+                                    <div class="cup-item cup-1-1"><div class="red-cup"></div></div>
+                                    <div class="flex gap-0.5 -mt-1">
+                                        <div class="cup-item cup-1-2"><div class="red-cup"></div></div>
+                                        <div class="cup-item cup-1-3"><div class="red-cup"></div></div>
+                                    </div>
+                                    <div class="flex gap-0.5 -mt-1">
+                                        <div class="cup-item cup-1-4"><div class="red-cup"></div></div>
+                                        <div class="cup-item cup-1-5"><div class="red-cup"></div></div>
+                                        <div class="cup-item cup-1-6"><div class="red-cup"></div></div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div class="cup-item cup-1-7"><div class="red-cup"></div></div>
+                                    <div class="flex gap-0.5 -mt-1">
+                                        <div class="cup-item cup-1-8"><div class="red-cup"></div></div>
+                                        <div class="cup-item cup-1-9"><div class="red-cup"></div></div>
+                                    </div>
+                                    <div class="flex gap-0.5 -mt-1">
+                                        <div class="cup-item cup-1-10"><div class="red-cup"></div></div>
+                                        <div class="cup-item cup-1-11"><div class="red-cup"></div></div>
+                                        <div class="cup-item cup-1-12"><div class="red-cup"></div></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Wind Streamlines -->
+                            <div id="wind-container-1" class="absolute inset-0 pointer-events-none hidden">
+                                <div class="wind-line animate-wind top-8 left-14 w-36" style="--wind-dur: 0.6s"></div>
+                                <div class="wind-line animate-wind top-16 left-10 w-44" style="--wind-dur: 0.45s"></div>
+                                <div class="wind-line animate-wind top-28 left-16 w-38" style="--wind-dur: 0.5s"></div>
+                            </div>
+                        </div>
+
+                        <!-- Speed Buttons -->
+                        <div class="mt-4 flex items-center justify-between gap-2 bg-slate-900 p-1.5 rounded-lg border border-slate-800">
+                            <span class="text-xs text-slate-400 font-semibold pl-2">Скорость:</span>
+                            <div class="flex gap-1.5">
+                                <button onclick="setFanSpeed(1, 0)" id="btn-1-0" class="speed-btn active bg-cyan-400 text-slate-950 font-black text-xs px-3 py-1.5 rounded-md transition">0</button>
+                                <button onclick="setFanSpeed(1, 1)" id="btn-1-1" class="speed-btn bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-3 py-1.5 rounded-md transition">1</button>
+                                <button onclick="setFanSpeed(1, 2)" id="btn-1-2" class="speed-btn bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-3 py-1.5 rounded-md transition">2</button>
+                                <button onclick="setFanSpeed(1, 3)" id="btn-1-3" class="speed-btn bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-3 py-1.5 rounded-md transition">3</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <ul class="text-xs text-slate-400 space-y-2 mb-6">
+                        <li class="flex justify-between border-b border-slate-800 pb-1.5"><span>Уровень шума</span><span class="text-slate-200 font-medium">32 дБ</span></li>
+                        <li class="flex justify-between border-b border-slate-800 pb-1.5"><span>Макс. поток</span><span class="text-slate-200 font-medium">4.8 м/с</span></li>
+                    </ul>
+                </div>
+
+                <button onclick="addToCart('AeroBreeze', 149)" class="w-full bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-black py-3 rounded-xl transition shadow-lg shadow-cyan-950/50">
+                    В корзину — 149 BYN
+                </button>
+            </div>
+
+            <!-- Product 2: AeroTower -->
+            <div class="bg-slate-900/90 rounded-2xl border border-slate-800 p-6 flex flex-col justify-between shadow-xl">
+                <div>
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Колонный</span>
+                            <h3 class="text-2xl font-bold text-white mt-1">AeroTower</h3>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-black text-white">389 <span class="text-sm text-cyan-400">BYN</span></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950 rounded-xl p-4 border border-slate-800/80 mb-6 relative overflow-hidden">
+                        <div class="flex justify-between items-center mb-3 text-xs">
+                            <span class="text-slate-400 font-medium">Тестовый стенд</span>
+                            <span id="speed-text-2" class="font-bold text-cyan-400 bg-cyan-950/60 px-2.5 py-1 rounded-md border border-cyan-800/40">0.0 м/с (0.0 км/ч)</span>
+                        </div>
+
+                        <div class="h-48 relative flex items-end justify-start px-2 overflow-hidden bg-gradient-to-b from-slate-950 to-slate-900/50 rounded-lg border border-slate-900">
+                            <!-- Fan Left -->
+                            <div class="z-20 relative flex flex-col items-center mb-1 shrink-0">
+                                <svg class="w-12 h-28 text-slate-300" viewBox="0 0 60 140" fill="none" stroke="currentColor">
+                                    <ellipse cx="30" cy="130" rx="25" ry="8" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+                                    <rect x="15" y="10" width="30" height="118" rx="6" fill="#0f172a" stroke="#06b6d4" stroke-width="2"/>
+                                    <rect x="20" y="25" width="20" height="85" rx="3" fill="#1e293b"/>
+                                    <line x1="25" y1="30" x2="25" y2="100" stroke="#06b6d4" stroke-width="1.5" stroke-dasharray="2 3"/>
+                                    <line x1="30" y1="30" x2="30" y2="100" stroke="#06b6d4" stroke-width="1.5" stroke-dasharray="2 3"/>
+                                    <line x1="35" y1="30" x2="35" y2="100" stroke="#06b6d4" stroke-width="1.5" stroke-dasharray="2 3"/>
+                                </svg>
+                            </div>
+
+                            <!-- 2 Red Cup Towers -->
+                            <div class="flex gap-1.5 items-end z-10 mb-1 ml-1 shrink-0">
+                                <div class="flex flex-col items-center">
+                                    <div class="cup-item cup-2-1"><div class="red-cup"></div></div>
+                                    <div class="flex gap-0.5 -mt-1">
+                                        <div class="cup-item cup-2-2"><div class="red-cup"></div></div>
+                                        <div class="cup-item cup-2-3"><div class="red-cup"></div></div>
+                                    </div>
+                                    <div class="flex gap-0.5 -mt-1">
+                                        <div class="cup-item cup-2-4"><div class="red-cup"></div></div>
+                                        <div class="cup-item cup-2-5"><div class="red-cup"></div></div>
+                                        <div class="cup-item cup-2-6"><div class="red-cup"></div></div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div class="cup-item cup-2-7"><div class="red-cup"></div></div>
+                                    <div class="flex gap-0.5 -mt-1">
+                                        <div class="cup-item cup-2-8"><div class="red-cup"></div></div>
+                                        <div class="cup-item cup-2-9"><div class="red-cup"></div></div>
+                                    </div>
+                                    <div class="flex gap-0.5 -mt-1">
+                                        <div class="cup-item cup-2-10"><div class="red-cup"></div></div>
+                                        <div class="cup-item cup-2-11"><div class="red-cup"></div></div>
+                                        <div class="cup-item cup-2-12"><div class="red-cup"></div></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Wind Streamlines -->
+                            <div id="wind-container-2" class="absolute inset-0 pointer-events-none hidden">
+                                <div class="wind-line animate-wind top-6 left-10 w-44" style="--wind-dur: 0.5s"></div>
+                                <div class="wind-line animate-wind top-16 left-14 w-38" style="--wind-dur: 0.4s"></div>
+                                <div class="wind-line animate-wind top-28 left-8 w-48" style="--wind-dur: 0.45s"></div>
+                            </div>
+                        </div>
+
+                        <!-- Speed Buttons -->
+                        <div class="mt-4 flex items-center justify-between gap-2 bg-slate-900 p-1.5 rounded-lg border border-slate-800">
+                            <span class="text-xs text-slate-400 font-semibold pl-2">Скорость:</span>
+                            <div class="flex gap-1.5">
+                                <button onclick="setFanSpeed(2, 0)" id="btn-2-0" class="speed-btn active bg-cyan-400 text-slate-950 font-black text-xs px-3 py-1.5 rounded-md transition">0</button>
+                                <button onclick="setFanSpeed(2, 1)" id="btn-2-1" class="speed-btn bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-3 py-1.5 rounded-md transition">1</button>
+                                <button onclick="setFanSpeed(2, 2)" id="btn-2-2" class="speed-btn bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-3 py-1.5 rounded-md transition">2</button>
+                                <button onclick="setFanSpeed(2, 3)" id="btn-2-3" class="speed-btn bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-3 py-1.5 rounded-md transition">3</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <ul class="text-xs text-slate-400 space-y-2 mb-6">
+                        <li class="flex justify-between border-b border-slate-800 pb-1.5"><span>Уровень шума</span><span class="text-slate-200 font-medium">28 дБ</span></li>
+                        <li class="flex justify-between border-b border-slate-800 pb-1.5"><span>Макс. поток</span><span class="text-slate-200 font-medium">6.8 м/с</span></li>
+                    </ul>
+                </div>
+
+                <button onclick="addToCart('AeroTower', 389)" class="w-full bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-black py-3 rounded-xl transition shadow-lg shadow-cyan-950/50">
+                    В корзину — 389 BYN
+                </button>
+            </div>
+
+            <!-- Product 3: AeroForce (Industrial) -->
+            <div class="bg-slate-900/90 rounded-2xl border border-slate-800 p-6 flex flex-col justify-between shadow-xl">
+                <div>
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Промышленный</span>
+                            <h3 class="text-2xl font-bold text-white mt-1">AeroForce</h3>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-black text-white">849 <span class="text-sm text-cyan-400">BYN</span></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950 rounded-xl p-4 border border-slate-800/80 mb-6 relative overflow-hidden">
+                        <div class="flex justify-between items-center mb-3 text-xs">
+                            <span class="text-slate-400 font-medium">Тестовый стенд</span>
+                            <span id="speed-text-3" class="font-bold text-cyan-400 bg-cyan-950/60 px-2.5 py-1 rounded-md border border-cyan-800/40">0.0 м/с (0.0 км/ч)</span>
+                        </div>
+
+                        <div class="h-48 relative flex items-end justify-start px-2 overflow-hidden bg-gradient-to-b from-slate-950 to-slate-900/50 rounded-lg border border-slate-900">
+                            <!-- Fan Left -->
+                            <div class="z-20 relative flex flex-col items-center mb-1 shrink-0">
+                                <svg class="w-20 h-24 text-slate-300" viewBox="0 0 110 120" fill="none" stroke="currentColor">
+                                    <path d="M20 115 L90 115 L75 80 L35 80 Z" fill="#1e293b" stroke="#334155" stroke-width="3"/>
+                                    <circle cx="55" cy="50" r="42" stroke="#06b6d4" stroke-width="4" fill="#0f172a"/>
+                                    <g id="blades-3" class="fan-blade-spin" style="transform-origin: 55px 50px;">
+                                        <circle cx="55" cy="50" r="8" fill="#06b6d4"/>
+                                        <path d="M55 50 Q35 25 55 12 Q75 25 55 50 Z" fill="#06b6d4"/>
+                                        <path d="M55 50 Q80 35 93 50 Q80 65 55 50 Z" fill="#06b6d4"/>
+                                        <path d="M55 50 Q75 75 55 88 Q35 75 55 50 Z" fill="#06b6d4"/>
+                                        <path d="M55 50 Q30 65 17 50 Q30 35 55 50 Z" fill="#06b6d4"/>
+                                    </g>
+                                </svg>
+                            </div>
+
+                            <!-- 2 Red Cup Towers -->
+                            <div class="flex gap-1.5 items-end z-10 mb-1 ml-1 shrink-0">
+                                <div class="flex flex-col items-center">
+                                    <div class="cup-item cup-3-1"><div class="red-cup"></div></div>
+                                    <div class="flex gap-0.5 -mt-1">
+                                        <div class="cup-item cup-3-2"><div class="red-cup"></div></div>
+                                        <div class="cup-item cup-3-3"><div class="red-cup"></div></div>
+                                    </div>
+                                    <div class="flex gap-0.5 -mt-1">
+                                        <div class="cup-item cup-3-4"><div class="red-cup"></div></div>
+                                        <div class="cup-item cup-3-5"><div class="red-cup"></div></div>
+                                        <div class="cup-item cup-3-6"><div class="red-cup"></div></div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div class="cup-item cup-3-7"><div class="red-cup"></div></div>
+                                    <div class="flex gap-0.5 -mt-1">
+                                        <div class="cup-item cup-3-8"><div class="red-cup"></div></div>
+                                        <div class="cup-item cup-3-9"><div class="red-cup"></div></div>
+                                    </div>
+                                    <div class="flex gap-0.5 -mt-1">
+                                        <div class="cup-item cup-3-10"><div class="red-cup"></div></div>
+                                        <div class="cup-item cup-3-11"><div class="red-cup"></div></div>
+                                        <div class="cup-item cup-3-12"><div class="red-cup"></div></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Wind Streamlines -->
+                            <div id="wind-container-3" class="absolute inset-0 pointer-events-none hidden">
+                                <div class="wind-line animate-wind top-6 left-14 w-48" style="--wind-dur: 0.35s"></div>
+                                <div class="wind-line animate-wind top-18 left-10 w-52" style="--wind-dur: 0.25s"></div>
+                                <div class="wind-line animate-wind top-30 left-16 w-44" style="--wind-dur: 0.3s"></div>
+                            </div>
+                        </div>
+
+                        <!-- Speed Buttons -->
+                        <div class="mt-4 flex items-center justify-between gap-2 bg-slate-900 p-1.5 rounded-lg border border-slate-800">
+                            <span class="text-xs text-slate-400 font-semibold pl-2">Скорость:</span>
+                            <div class="flex gap-1.5">
+                                <button onclick="setFanSpeed(3, 0)" id="btn-3-0" class="speed-btn active bg-cyan-400 text-slate-950 font-black text-xs px-3 py-1.5 rounded-md transition">0</button>
+                                <button onclick="setFanSpeed(3, 1)" id="btn-3-1" class="speed-btn bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-3 py-1.5 rounded-md transition">1</button>
+                                <button onclick="setFanSpeed(3, 2)" id="btn-3-2" class="speed-btn bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-3 py-1.5 rounded-md transition">2</button>
+                                <button onclick="setFanSpeed(3, 3)" id="btn-3-3" class="speed-btn bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-3 py-1.5 rounded-md transition">3</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <ul class="text-xs text-slate-400 space-y-2 mb-6">
+                        <li class="flex justify-between border-b border-slate-800 pb-1.5"><span>Уровень шума</span><span class="text-slate-200 font-medium">48 дБ</span></li>
+                        <li class="flex justify-between border-b border-slate-800 pb-1.5"><span>Макс. поток</span><span class="text-slate-200 font-medium">12.4 м/с</span></li>
+                    </ul>
+                </div>
+
+                <button onclick="addToCart('AeroForce', 849)" class="w-full bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-black py-3 rounded-xl transition shadow-lg shadow-cyan-950/50">
+                    В корзину — 849 BYN
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="cart-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-md w-full shadow-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-white">Ваша корзина</h3>
+                <button onclick="toggleCart()" class="text-slate-400 hover:text-white text-xl font-bold">&times;</button>
+            </div>
+            <div id="cart-items" class="space-y-3 mb-6 max-h-60 overflow-y-auto pr-1">
+                <p class="text-slate-500 text-sm text-center py-4">Корзина пуста</p>
+            </div>
+            <div class="flex justify-between items-center pt-4 border-t border-slate-800 mb-6">
+                <span class="text-slate-400 font-medium">Итого:</span>
+                <span id="cart-total" class="text-2xl font-black text-white">0 BYN</span>
+            </div>
+            <button onclick="checkout()" class="w-full bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-black py-3 rounded-xl transition">
+                Оформить заказ
+            </button>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-6 right-6 bg-cyan-400 text-slate-950 font-bold px-5 py-3 rounded-xl shadow-2xl transition transform translate-y-20 opacity-0 z-50">
+        Товар добавлен в корзину!
+    </div>
+
+    <script>
+        const fanData = {
+            1: {
+                type: 'desk',
+                speeds: [
+                    { ms: 0, kmh: 0, dur: 0, spin: 0 },
+                    { ms: 2.1, kmh: 7.6, dur: 1.8, spin: 0.8 },
+                    { ms: 3.4, kmh: 12.2, dur: 1.35, spin: 0.4 },
+                    { ms: 4.8, kmh: 17.3, dur: 1.05, spin: 0.2 }
+                ]
+            },
+            2: {
+                type: 'tower',
+                speeds: [
+                    { ms: 0, kmh: 0, dur: 0, spin: 0 },
+                    { ms: 3.2, kmh: 11.5, dur: 1.6, spin: 0.8 },
+                    { ms: 4.9, kmh: 17.6, dur: 1.25, spin: 0.4 },
+                    { ms: 6.8, kmh: 24.5, dur: 1.00, spin: 0.2 } // AeroTower Speed 3 = 1.00s
+                ]
+            },
+            3: {
+                type: 'industrial',
+                speeds: [
+                    { ms: 0, kmh: 0, dur: 0, spin: 0 },
+                    { ms: 6.5, kmh: 23.4, dur: 1.08, spin: 0.4 }, // AeroForce Speed 1 = 1.08s (strictly slower than 6.8 m/s)
+                    { ms: 9.2, kmh: 33.1, dur: 0.75, spin: 0.2 },
+                    { ms: 12.4, kmh: 44.6, dur: 0.50, spin: 0.1 }
+                ]
+            }
+        };
+
+        let cart = [];
+
+        function setFanSpeed(fanId, speedIndex) {
+            const data = fanData[fanId];
+            const speedInfo = data.speeds[speedIndex];
+
+            for (let i = 0; i <= 3; i++) {
+                const btn = document.getElementById(`btn-${fanId}-${i}`);
+                if (i === speedIndex) {
+                    btn.className = "speed-btn active bg-cyan-400 text-slate-950 font-black text-xs px-3 py-1.5 rounded-md transition";
+                } else {
+                    btn.className = "speed-btn bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-3 py-1.5 rounded-md transition";
+                }
+            }
+
+            const textElem = document.getElementById(`speed-text-${fanId}`);
+            textElem.textContent = `${speedInfo.ms.toFixed(1)} м/с (${speedInfo.kmh.toFixed(1)} км/ч)`;
+
+            const bladeElem = document.getElementById(`blades-${fanId}`);
+            if (bladeElem) {
+                if (speedIndex > 0) {
+                    bladeElem.style.setProperty('--spin-dur', `${speedInfo.spin}s`);
+                } else {
+                    bladeElem.style.setProperty('--spin-dur', '0s');
+                }
+            }
+
+            const windContainer = document.getElementById(`wind-container-${fanId}`);
+            if (speedIndex > 0) {
+                windContainer.classList.remove('hidden');
+            } else {
+                windContainer.classList.add('hidden');
+            }
+
+            const animClass = `animate-${data.type}`;
+            for (let cupNum = 1; cupNum <= 12; cupNum++) {
+                const cupElems = document.querySelectorAll(`.cup-${fanId}-${cupNum}`);
+                cupElems.forEach(elem => {
+                    elem.classList.remove('animate-desk', 'animate-tower', 'animate-industrial');
+                    
+                    if (speedIndex > 0) {
+                        const delay = (cupNum * 0.03).toFixed(2);
+                        elem.style.setProperty('--anim-dur', `${speedInfo.dur}s`);
+                        elem.style.animationDelay = `${delay}s`;
+                        
+                        void elem.offsetWidth;
+                        elem.classList.add(animClass);
+                    } else {
+                        elem.style.animationDelay = '0s';
+                    }
+                });
+            }
+        }
+
+        function addToCart(title, price) {
+            cart.push({ title, price });
+            updateCartUI();
+            
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2000);
+        }
+
+        function updateCartUI() {
+            const badge = document.getElementById('cart-badge');
+            const itemsElem = document.getElementById('cart-items');
+            const totalElem = document.getElementById('cart-total');
+
+            badge.textContent = cart.length;
+            if (cart.length > 0) {
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+
+            if (cart.length === 0) {
+                itemsElem.innerHTML = '<p class="text-slate-500 text-sm text-center py-4">Корзина пуста</p>';
+                totalElem.textContent = '0 BYN';
+                return;
+            }
+
+            let total = 0;
+            itemsElem.innerHTML = cart.map((item, idx) => {
+                total += item.price;
+                return `
+                    <div class="flex justify-between items-center bg-slate-950 p-3 rounded-xl border border-slate-800">
+                        <span class="text-sm font-medium text-slate-200">${item.title}</span>
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm font-bold text-cyan-400">${item.price} BYN</span>
+                            <button onclick="removeFromCart(${idx})" class="text-slate-500 hover:text-cyan-400 text-xs font-bold">&times;</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            totalElem.textContent = `${total} BYN`;
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        function toggleCart() {
+            const modal = document.getElementById('cart-modal');
+            modal.classList.toggle('hidden');
+        }
+
+        function checkout() {
+            if (cart.length === 0) return;
+            alert('Спасибо за заказ! Наш менеджер свяжется с вами.');
+            cart = [];
+            updateCartUI();
+            toggleCart();
+        }
+    </script>
+</body>
+</html>
